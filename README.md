@@ -7,7 +7,7 @@ The plugin is a modified and updated version of the Hadoop plugin provided with 
 
 It features more configuration options than the distributed plugin. These options can be set in the StarCluster 'config' file.
 
-The Hadoop software is assumed to be alreadly installed on the virtual machines.  A 'user-data' file is included in the repo for installing hadoop on Ubuntu server versions 12.04 and 12.10 and creating a compliant virtual machine.  This virtual machine can be burned into an AMI image and used as the node image id for the cluster.  Although StarCluster expects NFS to be installed on its virtual machines, Hadoop runs fine without it despite StarCluster's error messages.
+The Hadoop software is assumed to be alreadly installed on the virtual machines.  A 'user-data' file is included in the repo for installing Hadoop on Ubuntu server versions 12.04 and 12.10 and creating a compliant virtual machine.  This virtual machine can be burned into an AMI image and used as the node image id for the cluster.  Although StarCluster expects NFS to be installed on its virtual machines, Hadoop runs fine without it despite StarCluster's error messages.
 
 If you are familiar with Hadoop, Hadoop requires one user to be the Hadoop master superuser.  The master superuser is the user who starts the Hadoop daemons and who is authorized to do administration of the Hadoop distributed file system.  This user requires passwordless access through ssh to all the other nodes in order to do this.  This functionality is configured by the included user-data file.  
 
@@ -15,7 +15,7 @@ The plugin has a setting called HADOOP_USER that set the name of this Hadoop sup
 
 This plugin was intentionally designed not to be dependent on the StarCluster cluster user.  Because of that the cluster user can be used without restriction, for example as a general user of the Hadoop cluster.
 
-Oddly I found it easier to run Hadoop on Amazon's EC2 instances in cluster mode rather than in standalone mode on one machine. So please do not get put off if standalone mode does not work.   In addition, StarCluster makes it very easy to start a cluster of machines.  It, for example, configures each machine's /etc/hosts file so they can talk to each other.
+Oddly I found it easier to run Hadoop on Amazon's EC2 instances in cluster mode rather than in standalone mode on one machine. So please do not get put off if standalone mode does not work.   In addition, StarCluster makes it very easy to start a cluster of machines.  StarCluster, for example, automatically configures each machine's /etc/hosts file so they can talk to each other.
 
 An example starcluster 'config' file is shown below:
 
@@ -50,7 +50,7 @@ VOLUME_ID = vol-99999999
 MOUNT_PATH = /home/climate
 ```
 
-The cluster user in above configuration was used to run the Hadoop job.  The Hadoop user was reserved for superuser purposes.  Lastly, the 'volume climate' section was used to mount Amazon's climate public data set for analysis using Hadoop.
+The cluster user in above configuration was used to run the Hadoop job.  Next the user 'hadoop' was reserved for superuser purposes.  Lastly, the 'volume climate' section was used to mount the Amazon's climate public data set.
 
 As the config file shows, Hadoop can be run across Amazon EC2 micro instances.  If micro instances are used set the number of maximum map tasks to one since system memory is very limited on these instance types.
 
@@ -64,7 +64,7 @@ First start the cluster:
 $ starcluster start ansonia
 ```
 
-Wait till starcluster finishes then download the US Constitution and copy it into HDFS:
+Wait util starcluster finishes then download the US Constitution and copy it into HDFS:
 
 ```bash
 $ starcluster sshmaster ansonia -u george 'hadoop fs -mkdir input'
@@ -84,6 +84,9 @@ def mapper (key, value):
     for word in value.split(): yield word, 1
 def reducer (key, values):
     yield key, sum(values)
+if __name__ == "__main__":
+    import dumbo
+    dumbo.run(mapper, reducer, combiner=reducer)
 ```
 
 ```bash
@@ -95,7 +98,7 @@ Now run a word count against the constitution.  Note, the '-hadoop yes' option i
 ```bash
 $ starcluster sshmaster ansonia -u george 'dumbo start word.py -input input -output output -hadoop yes'
 $ starcluster sshmaster ansonia -u george 'hadoop fs -lsr'
-$ starcluster sshmaster ansonia -u george 'hadoop -cat output/part*'
+$ starcluster sshmaster ansonia -u george 'hadoop fs -cat output/part*'
 ```
 
 Shut down the cluster:
