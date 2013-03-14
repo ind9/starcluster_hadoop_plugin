@@ -9,11 +9,11 @@ It features more configuration options than the distributed plugin. These option
 
 The Hadoop software is assumed to be alreadly installed on the virtual machines.  A 'user-data' file is included in the repo for installing hadoop on Ubuntu server versions 12.04 and 12.10 and creating a compliant virtual machine.  This virtual machine can be burned into an AMI image and used as the node image id for the cluster.  Although StarCluster expects NFS to be installed on its virtual machines, Hadoop runs fine without it despite StarCluster's error messages.
 
-If you are familiar with Hadoop, Hadoop requires one user to be the hadoop 'master' superuser.  The master superuser is the user who starts the Hadoop daemons and who is authorized to do administration of the Hadoop distributed file system.  This user requires passwordless access through ssh to all the other nodes in order to do this.  This functionality is configured by the include user-data file.  
+If you are familiar with Hadoop, Hadoop requires one user to be the Hadoop master superuser.  The master superuser is the user who starts the Hadoop daemons and who is authorized to do administration of the Hadoop distributed file system.  This user requires passwordless access through ssh to all the other nodes in order to do this.  This functionality is configured by the included user-data file.  
 
-The plugin has a setting called HADOOP_USER that set the name of this hadoop superuser.  By default it is set to user 'hadoop'.  If the user name changes this setting much be changed as well.
+The plugin has a setting called HADOOP_USER that set the name of this Hadoop superuser.  By default it is set to user 'hadoop'.  If the user name changes this setting much be changed as well.
 
-This plugin was intentionally designed not to be dependent on the StarCluster 'cluster user'.  Because of that the cluster user can be used without restriction, for example as a general user of the hadoop cluster.
+This plugin was intentionally designed not to be dependent on the StarCluster cluster user.  Because of that the cluster user can be used without restriction, for example as a general user of the Hadoop cluster.
 
 Oddly I found it easier to run Hadoop on Amazon's EC2 instances in cluster mode rather than in standalone mode on one machine. So please do not get put off if standalone mode does not work.   In addition, StarCluster makes it very easy to start a cluster of machines.  It, for example, configures each machine's /etc/hosts file so they can talk to each other.
 
@@ -50,7 +50,7 @@ VOLUME_ID = vol-99999999
 MOUNT_PATH = /home/climate
 ```
 
-The cluster user in above configuration was used to run the hadoop job.  The hadoop user was reserved for superuser purposes.  Lastly, the 'volume climate' section was used to mount Amazon's climate public data set for analysis using Hadoop.
+The cluster user in above configuration was used to run the Hadoop job.  The Hadoop user was reserved for superuser purposes.  Lastly, the 'volume climate' section was used to mount Amazon's climate public data set for analysis using Hadoop.
 
 As the config file shows, Hadoop can be run across Amazon EC2 micro instances.  If micro instances are used set the number of maximum map tasks to one since system memory is very limited on these instance types.
 
