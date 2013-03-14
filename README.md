@@ -1,19 +1,21 @@
 starcluster_hadoop_plugin
 =========================
 
-This plugin configures and runs Hadoop using MIT's StarCluster software tools.  Once StarCluster is finished creating its cluster of virtual machines, it configures the cluster for Hadoop and then starts the Hadoop daemons.
+This plugin configures and runs Hadoop using MIT's StarCluster software tools.  Once StarCluster is finished creating its cluster of virtual machines, this plugin configures the cluster for Hadoop and then starts the Hadoop daemons.
 
 The plugin is a modified and updated version of the Hadoop plugin provided with the StarCluster version 0.93 distribution.  While the distributed plugin is limited to Hadoop version 0.20, this plugin supports Hadoop version 1.0.4 and should be general enough to support subsequent versions of Hadoop.
 
-It features more configuration options than the distributed plugin. These options can be set in the StarCluster config file.
+It features more configuration options than the distributed plugin. These options can be set in the StarCluster 'config' file.
 
-The Hadoop software is assumed to be alreadly installed on the virtual machines.  A user-data file is included in the repo for installing hadoop on Ubuntu server versions 12.04 and 12.10 and creating a compliant virtual machine that can be burned into an AMI image.  Although StarCluster expects NFS to be installed on its virtual machines, Hadoop runs fine without it despite StarCluster's error messages.
+The Hadoop software is assumed to be alreadly installed on the virtual machines.  A 'user-data' file is included in the repo for installing hadoop on Ubuntu server versions 12.04 and 12.10 and creating a compliant virtual machine.  This virtual machine can be burned into an AMI image and used as the node image id for the cluster.  Although StarCluster expects NFS to be installed on its virtual machines, Hadoop runs fine without it despite StarCluster's error messages.
 
-Hadoop requires one user to be the one hadoop 'master' user.  The master user starts the Hadoop daemons and is authorized to do administration of the Hadoop distributed file system.  This user needs passwordless access through ssh to all the other nodes in order to do this.  This functionality is setup by the include user-data file.  The plugin has a setting called HADOOP_USER that names the hadoop user.  By default it is set to user 'hadoop'.  If the user name changes the setting much be changed as well.
+If you are familiar with Hadoop, Hadoop requires one user to be the hadoop 'master' superuser.  The master superuser is the user who starts the Hadoop daemons and who is authorized to do administration of the Hadoop distributed file system.  This user requires passwordless access through ssh to all the other nodes in order to do this.  This functionality is configured by the include user-data file.  
 
-This plugin is not dependent on the StarCluster 'cluster user' therefore that user can be used without restriction.
+The plugin has a setting called HADOOP_USER that set the name of this hadoop superuser.  By default it is set to user 'hadoop'.  If the user name changes this setting much be changed as well.
 
-Oddly enough I found it easier to run Hadoop on Amazon's EC2 instances as a cluster than running it in standalone mode on one machine.  In addition StarCluster makes it very easy to start a cluster of machines.  For example it configures each machine's /etc/hosts file so they can talk to one another without having to set it up manually.
+This plugin was intentionally designed not to be dependent on the StarCluster 'cluster user'.  Because of that the cluster user can be used without restriction, for example as a general user of the hadoop cluster.
+
+Oddly I found it easier to run Hadoop on Amazon's EC2 instances in cluster mode rather than in standalone mode on one machine. So please do not get put off if standalone mode does not work.   In addition, StarCluster makes it very easy to start a cluster of machines.  It, for example, configures each machine's /etc/hosts file so they can talk to each other.
 
 An example starcluster 'config' file is shown below:
 
@@ -48,11 +50,11 @@ VOLUME_ID = vol-99999999
 MOUNT_PATH = /home/climate
 ```
 
-The cluster user was used to run hadoop job from, leaving the hadoop user for superuser purposes.  The 'volume climate' section was used to mount Amazon's climate public data set.
+The cluster user in above configuration was used to run the hadoop job.  The hadoop user was reserved for superuser purposes.  Lastly, the 'volume climate' section was used to mount Amazon's climate public data set for analysis using Hadoop.
 
-As the config file shows, hadoop can be run across micro instances on Amazon EC2.  However set the number of maximum map tasks to one because system memory is very limited.  Micro instances let you experiment using Amazon's free tier.  
+As the config file shows, Hadoop can be run across Amazon EC2 micro instances.  If micro instances are used set the number of maximum map tasks to one since system memory is very limited on these instance types.
 
-Moving to the m1.small instance types, the number of maximum map tasks can be raised to two, which is the default.  In addition, ephemeral storage is provided free for m1.small instances.  This storage can be used as part of HDFS.  The plugin assumes ephemeral storage is mounted on /mnt.  It should be noted that any user created AMIs must be configured to use ephemeral storage.  The easiest way to do this is through the AWS console interface when burning the AMI.
+Moving to the m1.small instance types, the number of maximum map tasks can be raised from one to two, which is the default.  In addition, ephemeral storage is provided free by Amazon for m1.small instances.  This storage can be used by the cluster as part of HDFS.  For this to happen the ephemeral storage must be mounted on /mnt.  This is where the plugin assumes ephemeral storage is mounted.  It should be noted that any user created AMI images must be explicitly configured to use ephemeral storage.  The easiest way to do this is through the AWS console interface when creating the AMI and selecting the instance storage tab.
 
 The included user-data file will also install the software package 'dumbo'.   Dumbo abstracts a lot of the complexity of writing and running map reduce jobs.  To give an sample session with Hadoop I will use dumbo as an example.
 
