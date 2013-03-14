@@ -60,7 +60,7 @@ First start the cluster:
 $ starcluster start ansonia
 ```
 
-Wait util StarCluster finishes then download the US Constitution and copy it into HDFS:
+Wait until StarCluster finishes then download the US Constitution and copy it into HDFS:
 
 ```bash
 $ starcluster sshmaster ansonia -u george 'hadoop fs -mkdir input'
