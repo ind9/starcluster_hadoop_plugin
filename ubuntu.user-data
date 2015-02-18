@@ -17,16 +17,15 @@ runcmd:
  - [sed, -i, 's/disable_root: 1/disable_root: 0/', /etc/cloud/cloud.cfg]
  - [sed, -i, 's/disable_root: true/disable_root: false/', /etc/cloud/cloud.cfg]
 
- # upgrade software and install java 6
- - [apt-get, -y, update]
- - [apt-get, -y, upgrade]
- - [apt-get, -y, install, openjdk-6-jdk]
-
- # install hadoop and set java_home
- - [wget, "http://download.nextag.com/apache/hadoop/common/hadoop-1.0.4/hadoop_1.0.4-1_x86_64.deb"]
+ # install cloudera repo and hadoop-client
+ - [wget, --output-document=/etc/yum.repos.d/cloudera-cdh4.repo, "http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/cloudera-cdh4.repo"]
+ - [yum, update, -y]
+ - [yum, install, hadoop-client, -y]
+ - [yum, install, hadoop-hdfs-namenode, -y]
+ - [yum, install, hadoop-hdfs-datanode, -y]
+ - [yum, install, hadoop-0.20-mapreduce-jobtracker, -y]
+ - [yum, install, hadoop-0.20-mapreduce-tasktracker, -y]
  - [groupadd, -r, hadoop]
- - [dpkg, -i, hadoop_1.0.4-1_x86_64.deb]
- - [rm, hadoop_1.0.4-1_x86_64.deb]
  - [sed, -i, s/java-6-sun/java-6-openjdk-amd64/, /etc/hadoop/hadoop-env.sh]
 
  # install dumbo
